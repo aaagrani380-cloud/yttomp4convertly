@@ -1,0 +1,65 @@
+services:
+  - type: keyvalue
+    name: convertly-redis
+    plan: starter
+    region: singapore
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: convertly-api
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        fromService:
+          name: convertly-redis
+          type: keyvalue
+          property: connectionString
+      - key: EPHEMERAL_OUTPUT_DIR
+        value: /tmp/convertly/downloads
+      - key: DOWNLOAD_TTL_MINUTES
+        value: "30"
+      - key: ALLOW_GUEST_CONVERSION
+        value: "false"
+      - key: WORKER_CONCURRENCY
+        value: "1"
+      - key: FORCE_COMPATIBLE_MP4
+        value: "true"
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  - type: cron
+    name: convertly-cleanup
+    runtime: docker
+    plan: starter
+    region: singapore
+    schedule: "*/5 * * * *"
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: node cleanup.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DOWNLOAD_TTL_MINUTES
+        value: "30"
+      - key: EPHEMERAL_OUTPUT_DIR
+        value: /tmp/convertly/downloads
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Sitemap: https://yttomp4convertly.netlify.app/sitemap.xml
+
+Disallow: /pages/admin.html
+Disallow: /pages/analytics.html

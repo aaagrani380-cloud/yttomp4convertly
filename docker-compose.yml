@@ -1,0 +1,38 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+  api:
+    build: ./backend
+    command: node server.js
+    restart: unless-stopped
+    env_file: ./backend/.env
+    depends_on:
+      - redis
+    ports:
+      - "8787:8787"
+    volumes:
+      - convertly_media:/tmp/convertly
+  worker:
+    build: ./backend
+    command: node worker.js
+    restart: unless-stopped
+    env_file: ./backend/.env
+    depends_on:
+      - redis
+    volumes:
+      - convertly_media:/tmp/convertly
+  cleanup:
+    build: ./backend
+    command: sh -c "while true; do node cleanup.js; sleep 300; done"
+    restart: unless-stopped
+    env_file: ./backend/.env
+    depends_on:
+      - redis
+    volumes:
+      - convertly_media:/tmp/convertly
+volumes:
+  redis_data:
+  convertly_media:

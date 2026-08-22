@@ -1,0 +1,29 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/supabase-config.js"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+
+
+# Proxy API requests through Netlify so the frontend does not need a browser-visible backend URL.
+# Keep the Render web service name as "convertly-api", or change this target to your API URL.
+[[redirects]]
+  from = "/api/*"
+  to = "https://convertly-api.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/pages/404.html"
+  status = 404
