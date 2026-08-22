@@ -19,7 +19,7 @@
 # Keep the Render web service name as "convertly-api", or change this target to your API URL.
 [[redirects]]
   from = "/api/*"
-  to = "https://convertly-api.onrender.com/api/:splat"
+      to = "https://yttomp4convertly-production.up.railway.app/api/:splat"
   status = 200
   force = true
 
